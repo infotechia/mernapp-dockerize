@@ -122,3 +122,22 @@ spec:
   type: NodePort
 status:
   loadBalancer: {}
+--- 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mern
+  annotations:
+    kubernetes.io/ingress.class: 'nginx'
+    nginx.ingress.kubernetes.io/rewrite-target: /  
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 3000
