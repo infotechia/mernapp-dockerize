@@ -77,6 +77,13 @@ spec:
   selector:
     app: db-deploy
 --- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: res
+  name: mern-front
 spec:
   replicas: 1
   selector:
