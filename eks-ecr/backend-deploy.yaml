@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: search
+  name: mern-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: search
+    spec:
+      containers:
+      - image: 117241568820.dkr.ecr.us-east-1.amazonaws.com/mernapp-ecr:latest
+        name: search
+        ports:
+          - containerPort: 5000
+      imagePullSecrets:
+        - name: regcred
