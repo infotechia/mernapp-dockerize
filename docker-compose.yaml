@@ -30,7 +30,7 @@ services:
             - mernapp
 
 networks:
-    clarusnet:
+    mernapp:
         driver: bridge
 
 volumes:
