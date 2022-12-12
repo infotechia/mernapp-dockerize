@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: search
+  name: mern-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: search
+    spec:
+      containers:
+      - image: 117241568820.dkr.ecr.us-east-1.amazonaws.com/mernapp-ecr:latest
+        name: search
+        ports:
+          - containerPort: 5000
+      imagePullSecrets:
+        - name: regcred
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: search
+  name: backend
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: search
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: db-deploy
+  name: db-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: db-deploy
+    spec:
+      containers:
+      - image: mongo:6.0.3
+        name: mongo
+        ports:
+          - containerPort: 27017
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: db-deploy
+  name: db
+spec:
+  ports:
+  - port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    app: db-deploy
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: res
+  name: mern-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: res
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: res
+    spec:
+      containers:
+      - image: 117241568820.dkr.ecr.us-east-1.amazonaws.com/mernapp-ecr:frontend
+        name: frontend
+        ports:
+          - containerPort: 3000
+      imagePullSecrets:
+        - name: regcred
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: res
+  name: frontend
+spec:
+  ports:
+  - port: 3000
+    protocol: TCP
+    targetPort: 3000
+    nodePort: 30003
+  selector:
+    app: res
+  type: NodePort
+status:
+  loadBalancer: {}
+--- 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 3000
+status:
+  loadBalancer: {}
+
